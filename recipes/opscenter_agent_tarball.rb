@@ -25,8 +25,10 @@ ark node['cassandra']['opscenter']['agent']['install_folder_name'] do
   checksum node['cassandra']['opscenter']['agent']['checksum']
   action :put
 end
-
+ 
 server_ip = node['cassandra']['opscenter']['agent']['server_host']
+puts "Your opscenter IP is #{server_ip}"
+
 unless server_ip && !node['cassandra']['opscenter']['agent']['use_chef_search']
 
   unless Chef::Config[:solo]
@@ -42,6 +44,8 @@ end
 
 agent_dir = ::File.join(node['cassandra']['opscenter']['agent']['install_dir'], node['cassandra']['opscenter']['agent']['install_folder_name'])
 
+puts "Your agent_dir is #{agent_dir}"
+
 template "#{agent_dir}/conf/address.yaml" do
   mode 0644
   source 'opscenter-agent.conf.erb'
@@ -52,6 +56,8 @@ end
 binary_name = node['cassandra']['opscenter']['agent']['binary_name']
 binary_grep_str = "[#{binary_name[0]}]#{binary_name[1..-1]}"
 
+puts "Your binary_name is #{binary_name}"
+
 service 'opscenter-agent' do
   provider Chef::Provider::Service::Simple
   supports :start => true, :status => true, :stop => true
@@ -60,3 +66,6 @@ service 'opscenter-agent' do
   stop_command "kill $(ps aux | grep '#{binary_grep_str}' | awk '{print $2}')"
   action :start
 end
+
+puts "did it start?"
+
